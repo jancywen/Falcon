@@ -14,7 +14,7 @@
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
-                    "/usr/local/mysql-connector-c++-8.0.21/include"
+                    "/usr/local/mysql-connector-c++-8.0.21/lib64"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

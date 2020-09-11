@@ -9,7 +9,21 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-I",
+                "/usr/local/mysql-connector-c++-8.0.21/include",
+                "-L",
+                "/usr/local/mysql-connector-c++-8.0.21/lib64",
+                "-l",
+                "crypto.1.1",
+                "-l",
+                "ssl.1.1",
+                "-l",
+                "mysqlcppconn.7.8.0.21",
+                "-l",
+                "mysqlcppconn8-static",
+                "-l",
+                "mysqlcppconn8.2.8.0.21",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

@@ -18,3 +18,14 @@
 2.找到 `mysql-connector-c++` 安装路径，建立软连接
 
     sudo ln -s /usr/local/mysql-connector-c++-8.0.21/lib64/libmysqlcppconn.7.8.0.21.dylib /usr/lib/libmysqlcppconn.7.dylib 
+    sudo ln -s /usr/local/mysql-connector-c++-8.0.21/lib64/libssl.1.1.dylib /usr/lib/libssl.1.1.dylib
+    sudo ln -s /usr/local/mysql-connector-c++-8.0.21/lib64/libcrypto.1.1.dylib /usr/lib/libcrypto.1.1.dylib
+
+报错
+
+    ln: /usr/lib/libmysqlcppconn.7.dylib: Read-only file system
+
+要先执行
+
+    sudo mount -uw /
+ 

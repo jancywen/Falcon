@@ -17,7 +17,7 @@
                 "-L",
                 "/usr/local/mysql-connector-c++-8.0.21/lib64",
                 "-l",
-                "mysqlcppconn",
+                "mysqlcppconn8",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

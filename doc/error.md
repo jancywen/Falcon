@@ -29,3 +29,12 @@
 
     sudo mount -uw /
  
+### CDK Error: unexpected message
+
+在使用 MySql8.0 为 C++ 提供的库 mysqlcppconn8执行时报错
+
+    libc++abi.dylib: terminating with uncaught exception of type mysqlx::abi2::r0::Error: CDK Error: unexpected message
+
+库 mysqlcppconn8 默认端口是 33060 而不是 3306，如果使用 3306 端口进行连接，就会报这样的错误。改为以下代码进行连接即可：
+
+    Session sess("localhost", 33060, "root", "rootpwd");

@@ -46,11 +46,8 @@ void returnBook(Session &session, int book_id, std::string card_id);
 // 查询 类别图书
 void searchBookRecord(Session &session, std::string category_name); 
 // 查询所有借阅信息
-void queryAllBorrowRecord();
-// 查询图书借阅信息 
-void searchBorrowRecord(std::string book_name);
-// 查询未归还的借阅信息
-void queryBorrowRecord();
+void queryAllBorrowRecord(Session &session);
+
 
 
 int main()
@@ -94,6 +91,8 @@ int main()
 
     // 还书
     // returnBook(session, 20200913, "4562135468");
+
+    queryAllBorrowRecord(session);
 
     session.close();
     return 0;
@@ -286,22 +285,6 @@ void calculateCost(Session & session)
         }
 }
 
-// 查询某段时间所有借阅信息  xx 于 xx 借阅了 xxx，xx归还，费用：xx 或者 未归还
-void queryAllBorrowRecord()
-{
-
-}
-// 查询图书借阅信息 
-void searchBorrowRecord(std::string book_name)
-{
-
-}
-// 查询未归还的借阅信息
-void queryBorrowRecord()
-{
-
-}
-
 // 充值
 void recharge(Session &session, std::string card_id, float balance)
 {
@@ -403,4 +386,28 @@ void returnBook(Session &session, int book_id, std::string card_id)
     }
 
     cout << "还书成功" << endl;
+}
+
+// 查询某段时间所有借阅信息  xx 于 xx 借阅了 xxx，xx归还，费用：xx 或者 未归还
+void queryAllBorrowRecord(Session &session)
+{
+    session.sql("use " + std::string(SCHEMA)).execute();
+
+    SqlResult res = session.sql("select name, borrow_date, category, book_name, status, category" 
+                                " from borrowinfo t1" 
+                                " join bookinfo t2 on t1.book_id = t2.book_id" 
+                                " join readerinfo t3 on t1.card_id = t3.card_id" 
+                                // " t2 join bookcategory t4 on t2.book_category_id = t4.category_id"
+                                ).execute();
+    list<Row> list = res.fetchAll();
+    int column_count = res.getColumnCount();
+    for (Row row : list) 
+        {
+            for (int i = 0; i < column_count; i++)
+            {
+                cout << row[i] << " ";
+            }
+            cout << endl;
+        }
+
 }

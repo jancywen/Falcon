@@ -1,10 +1,73 @@
 #include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <string>
+#include <stdexcept>
+
 using namespace std;
 
 
 const int MAX = 3;
 
 void getSeconds(unsigned long *par);
+// 函数模板
+template <typename T>
+inline T const& Max(T const& a, T const& b)
+{
+    return a < b ? b : a;
+}
+
+// 类模板
+template <class T>
+class Stack
+{
+private:
+    vector <T> elems;
+public:
+    void push(T const&);
+    void pop();
+    T top() const;
+    void desc();
+    bool empty() const{
+        return elems.empty();
+    }
+};
+
+template <class T>
+void Stack<T>::push(T const& elem)
+{
+    elems.push_back(elem);
+}
+
+template <class T>
+void Stack<T>::pop() 
+{
+    if (elems.empty())
+    {
+        throw out_of_range("Stack<>::pop(): empty stack");
+    }
+    elems.pop_back();
+}
+
+template <class T>
+T Stack<T>::top() const
+{
+    if (elems.empty())
+    {
+        throw out_of_range("Stack<>::top(): empty stack");
+    }
+    return elems.back();
+}
+
+template <class T>
+void Stack<T>::desc()
+{
+    //for
+    for (int i = 0; i < elems.size(); i++)
+    {
+      cout << "value of elems [" << i << "] = " << elems[i] << endl;
+    }
+}
 
 int main()
 {
@@ -90,6 +153,33 @@ cout << "\n\n******************\n\n" << endl;
         int_pointer++;
     }
 
+cout << "\n\n******************\n\n" << endl;
+
+    try 
+    {
+        Stack<int> intStack;
+        Stack<string> stringStack;
+
+        intStack.push(7);
+        intStack.desc();
+    }
+    catch (exception const& e)
+    {
+        cerr<< "Exception: " <<e.what() <<endl;
+    }
+
+cout << "\n\n******************\n\n" << endl;
+
+    vector<int> vec;
+    vec.push_back(10);
+    // 迭代器
+    vector<int>::iterator v = vec.begin();
+    while (v!=vec.end())
+    {   
+        cout << "value of v = " << *v <<endl;
+        v++;
+    }
+    
 
     return 0;
 }

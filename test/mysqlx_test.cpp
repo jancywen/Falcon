@@ -76,7 +76,6 @@ int main()
     insertReaderData("4562135469", "昭君", "女", 23, "12739247", 200);
     insertReaderData("4562135470", "杨贵妃", "女", 28, "12739247", 200);
     insertReaderData("4562135471", "赵子龙", "男", 17, "12739247", 200);
-    insertReaderData("4562135472", "典韦", "男", 25, "12739247", 200);
 
 */
 
@@ -397,7 +396,6 @@ void queryAllBorrowRecord(Session &session)
                                 " from borrowinfo t1" 
                                 " join bookinfo t2 on t1.book_id = t2.book_id" 
                                 " join readerinfo t3 on t1.card_id = t3.card_id" 
-                                // " t2 join bookcategory t4 on t2.book_category_id = t4.category_id"
                                 ).execute();
     list<Row> list = res.fetchAll();
     int column_count = res.getColumnCount();

@@ -4,6 +4,101 @@
 using namespace std;
 
 
+template<class T, class... Args>
+std::unique_ptr<T>
+my_make_unique(Args&&... args) {
+    return std::unique_ptr<T>(
+        new T(std::forward<Args>(args)...)
+    );
+}
+
+void case1() 
+{
+    using namespace std;
+    {
+        unique_ptr<int> ptr1(new int(10));
+        cout << *ptr1 << endl;
+
+        unique_ptr<string> ptr2(new string("hello world"));
+        cout << *ptr2 <<endl;
+        cout << ptr2->size() << endl;
+
+        auto ptr3 = make_unique<int>(42);
+        cout << *ptr3 <<endl;
+
+        auto ptr4 = make_unique<string>("god of war");
+        cout <<ptr4->empty() <<endl;
+
+        auto ptr5 = my_make_unique<long>(100L);
+        cout <<*ptr5 <<endl;
+
+    } // namespace std;
+    
+}
+
+
+void case2()
+{
+    using namespace std;
+    {
+        auto ptr1 = make_unique<int>(42);
+
+        cout <<*ptr1 <<endl;
+
+        auto ptr2 = std::move(ptr1);
+
+
+        if (!ptr1) {
+            cout <<"ptr1 is null" <<endl;
+        }
+
+        cout << *ptr2 <<endl;
+
+    } // namespace std;
+    
+}
+
+void case3()
+{
+    using namespace std;
+    {
+        shared_ptr<int> ptr1(new int(10));
+        cout << *ptr1 <<endl;
+
+        shared_ptr<string> ptr2(new string("hello"));
+        cout << *ptr2 <<endl;
+
+        auto ptr3 = make_shared<int>(42);
+        cout << *ptr3 <<endl;
+
+        auto ptr4 = make_shared<string>("wells");
+        cout << *ptr4 <<endl;
+        cout << ptr4->empty() <<endl;
+    } // namespace std;
+    
+}
+
+void case4()
+{
+    using namespace std;
+    {
+        auto ptr1 = make_shared<int>(42);
+        cout << ptr1.unique() << endl; // 唯一性
+
+        auto ptr2 = ptr1; //直接赋值
+
+        // ptr1、ptr2 都不唯一，且引用计数为 2
+        cout<< ptr1.unique() <<endl;
+        cout <<ptr1.use_count() <<endl;
+        cout << ptr2.unique() <<endl;
+        cout << ptr2.use_count() <<endl;
+
+    } // namespace std;
+    
+}
+
+
+
 class Node final
 {
     public:
@@ -11,6 +106,13 @@ class Node final
         using shared_type = std::weak_ptr<this_type>;
     public:
         shared_type next;
+    public:
+        Node() = default;
+        ~Node()
+        {
+            using namespace std;
+            cout <<"node dtor" <<endl;
+        }
 };
 
 void somefunc() 
@@ -21,13 +123,14 @@ void somefunc()
     cout<< n1.use_count() << endl;
     cout<< n2.use_count() <<endl;
 
+    // 两个节点互指，形成了循环引用
     n1->next = n2;
     n2->next = n1;
-
+    // 因为使用了weak_ptr，引用计数为1
     cout << n2.use_count() << endl;
 
-    if (!n1->next.expired()) {
-        auto ptr = n1->next.lock();
+    if (!n1->next.expired()) { // 检查指针是否有效
+        auto ptr = n1->next.lock(); // lock()获取shared_ptr
         cout << (ptr == n2) << endl;
     }
 }

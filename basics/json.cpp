@@ -35,7 +35,7 @@ void case1()
         {"gear", {"suits", "2099"}}
     };
 
-    cout << j1.dump(2) << endl;
+    cout << j1.dump(2) << endl;     // 序列化 2个缩进
 }
 
 void case2() 
@@ -45,7 +45,7 @@ void case2()
         "age" : 23,
         "married" : true
     })";
-    auto j = json_t::parse(str);
+    auto j = json_t::parse(str);    //反序列化
     cout <<j.dump(2) <<endl;
 }
 

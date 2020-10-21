@@ -1,64 +1,74 @@
+// g++ zmq.cpp -std=c++14 -lzmq -lpthread -I../common -o zmq
+
 #include <iostream>
 
 #include <string>
 #include <vector>
 #include <future>
-// #include <zmq.h>
+#include <zmq.h>
 #include <zmq_addon.hpp>
 
 using namespace std;
 
-#if 0
-const auto thread_num = 1;
-
-zmq::context_t context(thread_num);
-
-auto make_sock = [&](auto mode)
+void PublisherThread(zmq::context_t *ctx)
 {
-    return zmq::socket_t(context, mode);
-};
 
+    zmq::socket_t publisher(*ctx, zmq::socket_type::pub);
+    publisher.bind("inproc://#1");
 
-void case1()
-{
-    const auto addr = "ipc:///dev/shm/zmq.sock"s;
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-    auto receiver = [=]()
+    while (true)    
     {
-        auto sock = make_sock(zmq::socket_type::pull);
-
-        sock.bind(addr);
-        assert(sock.connected());
-
-        zmq::message_t msg;
-
-        sock.recv(&msg);
-
-        cout << msg.size() << endl;
-
-        string s = {msg.data<char>(), msg.size()};
-        cout << s << endl;
-
-    };
-
-    auto sender = [=]()
-    {
-        auto sock = make_sock(zmq::socket_type::push);
-
-        sock.connect(addr);
-        assert(sock.connected());
-
-        string s = "hello zmq";
-        //zmq::message_t msg(begin(s), end(s));
-        //sock.send(msg);
-
-        sock.send(s.data(), s.size());
-    };
-
-    sender();
-    receiver();
+        publisher.send(zmq::str_buffer("A"), zmq::send_flags::sndmore);
+        publisher.send(zmq::str_buffer("Message in A envelope"));
+        publisher.send(zmq::str_buffer("B"), zmq::send_flags::sndmore);
+        publisher.send(zmq::str_buffer("Message in B envelope"));
+        publisher.send(zmq::str_buffer("C"), zmq::send_flags::sndmore);
+        publisher.send(zmq::str_buffer("Message in C envelope"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }   
 }
-#endif
+
+void SubscriberThread1(zmq::context_t *ctx)
+{
+    zmq::socket_t subscriber(*ctx, zmq::socket_type::sub);
+    subscriber.connect("inproc://#1");
+    
+    subscriber.set(zmq::sockopt::subscribe, "A");
+    subscriber.set(zmq::sockopt::subscribe, "B");
+
+    while (1)   
+    {
+        std::vector<zmq::message_t> recv_msgs;
+        zmq::recv_result_t result = zmq::recv_multipart(subscriber, std::back_inserter(recv_msgs));
+        assert(result && "recv failed");
+
+        std::cout << "Thread2: [" << recv_msgs[0].to_string() << "] "
+            << recv_msgs[1].to_string() <<std::endl;
+    }
+    
+}
+
+void SubscriberThread2(zmq::context_t *ctx) {
+    //  Prepare our context and subscriber
+    zmq::socket_t subscriber(*ctx, zmq::socket_type::sub);
+    subscriber.connect("inproc://#1");
+
+    //  Thread3 opens ALL envelopes
+    subscriber.set(zmq::sockopt::subscribe, "");
+
+    while (1) {
+        // Receive all parts of the message
+        std::vector<zmq::message_t> recv_msgs;
+        zmq::recv_result_t result =
+          zmq::recv_multipart(subscriber, std::back_inserter(recv_msgs));
+        assert(result && "recv failed");
+
+        std::cout << "Thread3: [" << recv_msgs[0].to_string() << "] "
+                  << recv_msgs[1].to_string() << std::endl;
+    }
+}
 
 int main()
 {
@@ -68,31 +78,17 @@ int main()
     cout << "version = "
          << a << b << c << endl;
     
-    // case1();
+    zmq::context_t ctx(0);
 
+    auto thread1 = std::async(std::launch::async, PublisherThread, &ctx);
 
-    zmq::context_t ctx;
-    zmq::socket_t sock1(ctx, zmq::socket_type::pair);
-    zmq::socket_t sock2(ctx, zmq::socket_type::pair);
-    sock1.bind("inproc://test");
-    sock2.connect("inproc://test");
+    // Give the publisher a chance to bind, since inproc requires it
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-    std::array<zmq::const_buffer, 2> send_msgs = {
-        zmq::str_buffer("foo"),
-        zmq::str_buffer("bar!")
-    };
-    if (!zmq::send_multipart(sock1, send_msgs))
-        return 1;
+    auto thread2 = std::async(std::launch::async, SubscriberThread1, &ctx);
+    auto thread3 = std::async(std::launch::async, SubscriberThread2, &ctx);
+    thread1.wait();
+    thread2.wait();
+    thread3.wait();
 
-    std::vector<zmq::message_t> recv_msgs;
-    const auto ret = zmq::recv_multipart(
-        sock2, std::back_inserter(recv_msgs));
-    if (!ret)
-        return 1;
-    std::cout << "Got " << *ret
-              << " messages" << std::endl;
-
-
-
-    cout << "zmq demo" << endl;
 }

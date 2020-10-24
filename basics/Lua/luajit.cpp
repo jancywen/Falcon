@@ -108,6 +108,15 @@ void case4()
 
 }
 
+void case5()
+{
+    auto vm = make_luavm();
+
+    int status;
+    status = luaL_dofile(L, "../../bookstore/conf.lua");
+    assert(status == 0);
+}
+
 int main()
 {
     // case1();
@@ -116,7 +125,9 @@ int main()
 
     // case3();
 
-    case4();
+    // case4();
+
+    case5();
 
     cout <<"luajit demo"<<endl;
 }

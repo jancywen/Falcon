@@ -27,3 +27,6 @@ print(shared.num)                                   -- 调用C接口
 
 local x = shared.my_add(1, 2)                       -- 调用C接口
 print(x)
+
+
+-- debug: luajit shared.lua

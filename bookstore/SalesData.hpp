@@ -19,7 +19,7 @@ public:
 
 public:
     using string_type       = std::string;                  // 外部类型别名
-    using string_view_type  = const std::string_view;
+    using string_view_type  = const std::string;
     using uint_type         = unsigned int;
     using currency_type     = double;
 

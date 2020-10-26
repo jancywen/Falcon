@@ -4,6 +4,7 @@
 #include "cpplang.hpp"
 #include "SalesData.hpp"
 #include "SpinLock.hpp"
+#include <map>
 
 BEGIN_NAMESPACE(cpp_study)
 
@@ -17,7 +18,7 @@ public:
     using lock_guard_type = SpinLockGuard;
 
     using string_type = std::string;
-    using map_type = std::map<string_type, sales_type>;
+    using map_type =std::map<string_type, sales_type>;
 
     using minmax_sales_type = std::pair<string_type, string_type>;
 
@@ -55,7 +56,7 @@ public:
         }
 
         auto ret = std::minmax_element(
-            std::begin(m_sales), std::end(m_sales),
+            m_sales.begin(), m_sales.end(),
             [](const auto& a, const auto& b)
             {
                 return a.second.sold() < b.second.sold();

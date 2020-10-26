@@ -11,7 +11,7 @@ extern "C" {
     #include <luajit-2.1/lauxlib.h>
 }
 
-#include <LuaBridge.h>
+#include <LuaBridge/LuaBridge.h>
 
 BEGIN_NAMESPACE(cpp_study)
 

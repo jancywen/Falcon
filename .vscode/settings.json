@@ -84,6 +84,9 @@
         "regex": "cpp",
         "unordered_set": "cpp",
         "__functional_03": "cpp",
-        "__functional_base_03": "cpp"
+        "__functional_base_03": "cpp",
+        "clocale": "cpp",
+        "numeric": "cpp",
+        "valarray": "cpp"
     }
 }

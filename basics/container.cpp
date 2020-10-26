@@ -1,3 +1,5 @@
+//  g++ container.cpp -std=c++14
+
 #include <iostream>
 #include <vector>
 #include <array>
@@ -167,6 +169,17 @@ void case7()
     cout << endl;
 }
 
+void case8() 
+{
+    map<string, string> m;
+    m["key1"] = "value1";
+    m.emplace("key4", "value4");
+    m["key3"] = "value3";
+
+    auto inter = m.find("key1");
+    cout<< inter->first <<endl;
+    cout << inter->second <<endl;
+}
 
 int main()
 {
@@ -176,7 +189,8 @@ int main()
     // case4();
     // case5();
     // case6();
-    case7();
+    // case7();
+    case8();
 
     return 0;
 }

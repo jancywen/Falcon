@@ -44,7 +44,13 @@ try
 {
     cout << "hello cpp study server" <<endl;
 
-    
+    Config conf;
+    conf.load("./conf.lua");
+    auto addr = conf.get<std::string>("config.zmq_ipc_addr");
+    std::cout << "address "<< addr << std::endl;
+
+#if 0
+
     auto get = [](std::string key) {
         cout << "log" <<endl;
         auto reg = std::regex(R"(^(\w+)\.(\w+)$)");
@@ -74,6 +80,7 @@ try
     auto addr = get("config.zmq_ipc_addr");
     
     cout << addr << endl;
+#endif
 
     Summary sum;
     std::atomic_int count {0};
@@ -91,7 +98,7 @@ try
             auto msg_ptr = std::make_shared<zmq_message_type>();
 
             sock.recv(msg_ptr.get());
-std::cout <<"msg_ptr->size()" <<  msg_ptr->size() <<endl;
+            std::cout <<"msg_ptr->size()" <<  msg_ptr->size() <<endl;
             std::thread(
                 [&sum, msg_ptr]() 
             {
@@ -107,6 +114,7 @@ std::cout <<"msg_ptr->size()" <<  msg_ptr->size() <<endl;
         }
 #endif
 
+#if 0
         for(;;) {
             auto msg_ptr = std::make_shared<zmq_message_type>();
 
@@ -125,6 +133,28 @@ std::cout <<"msg_ptr->size()" <<  msg_ptr->size() <<endl;
                 // std::thread(func).detach();
                 ++count;
                 func();
+            }
+        }
+
+#endif
+        for(;;) {
+
+            auto msg_ptr = std::make_shared<zmq_message_type>();
+            sock.recv(*msg_ptr.get(), zmq::recv_flags::dontwait);
+
+            auto f = [&sum, msg_ptr]()
+            {
+                SalesData book;
+
+                auto obj = msgpack::unpack(msg_ptr->data<char>(), msg_ptr->size()).get();
+                obj.convert(book);
+
+                debug_print(book);
+                sum.add_sales(book);
+            };
+            if (msg_ptr->size() >0) {
+                ++count;
+                std::thread(f).detach();
             }
         }
 

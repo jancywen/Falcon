@@ -22,7 +22,7 @@ public:
     using value_type        = luabridge::LuaRef;
 
     using string_type       = std::string;
-    using string_view_type  = std::string_view;
+    using string_view_type  = const std::string&;
     using regex_type        = std::regex;
     using match_type        = std::smatch;
 
@@ -68,7 +68,7 @@ private:
     vm_type m_vm                            // 类型别名定义Lua虚拟机
         {luaL_newstate(), lua_close};       // 成员变量初始化
 
-    const regex_type    m_reg {R"(^(\w+)\.\(w+)$)"};
+    const regex_type    m_reg {R"(^(\w+)\.(\w+)$)"};
     mutable match_type  m_what;
 };
 
